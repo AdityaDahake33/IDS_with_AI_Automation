@@ -1,0 +1,291 @@
+{
+  "name": "Final Year Project",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "snort-alert",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -512,
+        112
+      ],
+      "id": "83a8080e-6704-4277-9e14-15723c7e3648",
+      "name": "Webhook",
+      "webhookId": "efba7d41-39b4-47bd-a59d-0f849233d3a9"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.alert }}",
+              "operation": "contains",
+              "value2": "Attack"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      },
+      "id": "5512d085-8d2d-43fc-992f-ec31e1970456",
+      "name": "Check If Attack",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:3000/api/block-ip",
+        "responseFormat": "string",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"ip\": \"{{ $('Append row in sheet').item.json.host }}\"\n}",
+        "headerParametersJson": "="
+      },
+      "id": "2eddf7f7-f3da-4148-aaaf-6bf19ceed7b6",
+      "name": "Block Suspicious IP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        576,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ftuPS97xXzaoHp6bE9PJufQUsNVTDBF6U1D22tH0ITc",
+          "mode": "list",
+          "cachedResultName": "Project IDS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ftuPS97xXzaoHp6bE9PJufQUsNVTDBF6U1D22tH0ITc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ftuPS97xXzaoHp6bE9PJufQUsNVTDBF6U1D22tH0ITc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "host": "={{ $json.headers.host }}",
+            "user-agent": "={{ $json.headers['user-agent'] }}",
+            "accept-encoding": "={{ $json.headers['accept-encoding'] }}",
+            "accept": "={{ $json.headers.accept }}",
+            "connection": "={{ $json.headers.connection }}",
+            "content-length": "={{ $json.headers['content-length'] }}",
+            "content-type": "={{ $json.headers['content-type'] }}",
+            "alert": "={{ $json.body.alert }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "host",
+              "displayName": "host",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user-agent",
+              "displayName": "user-agent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "accept-encoding",
+              "displayName": "accept-encoding",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "accept",
+              "displayName": "accept",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "connection",
+              "displayName": "connection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "content-length",
+              "displayName": "content-length",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "content-type",
+              "displayName": "content-type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alert",
+              "displayName": "alert",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        224
+      ],
+      "id": "2ad7bfc5-f75a-425f-b3f9-a89e7209691c",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "X9tAzg2wgwPVNDSy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/alerts",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "name": "Send to Frontend API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2a8a7d71-867c-4f0f-ac92-1c0bcf7d119b"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:3000/api/alerts",
+        "responseFormat": "string",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"timestamp\": \"{{ new Date().toISOString() }}\",\n  \"message\": \"{{ $json.alert }}\",\n  \"source\": {\n    \"host\": \"{{ $json.host }}\",\n    \"userAgent\": \"{{ $json['user-agent'] }}\",\n    \"contentType\": \"{{ $json['content-type'] }}\"\n  }\n}"
+      },
+      "name": "Send To Application",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        304,
+        224
+      ],
+      "id": "4e236f60-e1c9-429a-8a60-fab0ca4b308f"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Check If Attack": {
+      "main": [
+        [
+          {
+            "node": "Send to Frontend API1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check If Attack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send To Application",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send To Application": {
+      "main": [
+        [
+          {
+            "node": "Block Suspicious IP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "80dde0b4-f016-4608-9d3d-be9e96c2a76d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "69a2ccc8d36d8c7e36fcf7f5a617755fd884decae200fdc4bb5b76ca7a6a6003"
+  },
+  "id": "A7OuqlJHmCtZcvgD",
+  "tags": [
+    {
+      "createdAt": "2025-09-10T05:25:14.082Z",
+      "updatedAt": "2025-09-10T05:25:14.082Z",
+      "id": "BzjkuNhIHevjeph0",
+      "name": "API"
+    }
+  ]
+}
